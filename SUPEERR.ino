@@ -27,7 +27,7 @@ unsigned char cardValue[] = {
 cardNode* generateCardDeck();
 unsigned char takeRandomCard(cardNode *card);
 
-unsigned char getCardGameValue(unsigned char value);
+unsigned char getCardGameValue(unsigned char value, unsigned char v);
 void destroyCardDeck(cardNode* cardDeck);
 
 void buttonClicked();
@@ -59,8 +59,8 @@ void loop() {
 
 	switch(gameState) {
 		case 0:
-			playerDeck = getCardGameValue(takeRandomCard(cardDeck));
-    	dealersDeck = getCardGameValue(takeRandomCard(cardDeck));
+			playerDeck = getCardGameValue(takeRandomCard(cardDeck), playerDeck);
+    	dealersDeck = getCardGameValue(takeRandomCard(cardDeck), dealersDeck);
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Pelaajan:");
@@ -74,11 +74,10 @@ void loop() {
 			break;
 		case 1:
       if (hitPressed) {
-        playerDeck += getCardGameValue(takeRandomCard(cardDeck));
+        playerDeck += getCardGameValue(takeRandomCard(cardDeck), playerDeck);
         lcd.setCursor(9, 0);
         lcd.print(playerDeck);
         if (playerDeck > 21) {
-          Serial.println("Jakajavoitti");
           gameState = 2;
         }
         hitPressed = false;
@@ -89,7 +88,6 @@ void loop() {
       }
 			break;
 		case 2:
-      Serial.println("jakaa");
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("Jakaja voitti!");
@@ -133,7 +131,7 @@ void loop() {
       break;
     case 6:
       if (dealersDeck < 17) {
-          dealersDeck += getCardGameValue(takeRandomCard(cardDeck));
+          dealersDeck += getCardGameValue(takeRandomCard(cardDeck), dealersDeck);
         } else {
           if (dealersDeck > 21) {
             gameState = 3;
@@ -209,10 +207,13 @@ unsigned char takeRandomCard(cardNode* cardDeck) {
 	}
 }
 
-unsigned char getCardGameValue(unsigned char value) {
+unsigned char getCardGameValue(unsigned char value, unsigned char v) {
 	if (value > 1 && value < 10) return value;
 	else if (value > 9 && value < 14) return 10;
-	else return 1;
+	else {
+    if (v + 11 < 22) return 11;
+    else return 1;
+	}
 }
 
 
